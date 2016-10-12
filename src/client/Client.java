@@ -28,7 +28,7 @@ public class Client implements ClientRequestManager {
 	public void receiveResource() throws RemoteException {
 		System.out.println("Obtained resource. " + getPID());
 	    try {
-	    	Thread.sleep(randInt.nextInt(20000));
+	    	Thread.sleep(randInt.nextInt(8000));
 	    } catch (InterruptedException e) {
 
 	    }
@@ -36,7 +36,7 @@ public class Client implements ClientRequestManager {
 	    remoteServer.freeResource();
 	}
 	
-	public Client(String serverAddr, int portNumber){
+	public Client(String clientAddr, String serverAddr, int portNumber){
 		
 		
 		randInt = new Random();
@@ -44,6 +44,7 @@ public class Client implements ClientRequestManager {
 		try {
 			registry = LocateRegistry.getRegistry(serverAddr, portNumber);
 			remoteServer = (ServerRequestManager) registry.lookup("rmiServer");
+        	System.setProperty("java.rmi.server.hostname", clientAddr);
 	        remoteClient = (ClientRequestManager) UnicastRemoteObject.exportObject(this, 0);
 
 			
@@ -74,14 +75,18 @@ public class Client implements ClientRequestManager {
 	
 	static public void main(String[] args) {
 		String serverAddr = "localhost";
+		String clientAddr = "localhost";
 		int portAddr = 3456;
 		if (args.length >= 1) {
-			serverAddr = args[0];
+			clientAddr = args[0];
 		}
 		if (args.length >= 2) {
-			portAddr = Integer.parseInt(args[1]);
+			serverAddr = args[1];
 		}
-		Client client = new Client(serverAddr, portAddr);
+		if (args.length >= 3) {
+			portAddr = Integer.parseInt(args[2]);
+		}
+		Client client = new Client(clientAddr, serverAddr, portAddr);
 		client.run();
 	}
 
