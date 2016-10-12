@@ -15,15 +15,22 @@ public class Client implements ClientRequestManager {
 	ClientRequestManager remoteClient;
 	Registry registry;
 	
+
+  public static long getPID() {
+	    String processName =
+	      java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
+	    return Long.parseLong(processName.split("@")[0]);
+	  }
+	
 	@Override
 	public void receiveResource() throws RemoteException {
-		System.out.println("Obtained resource");
+		System.out.println("Obtained resource. " + getPID());
 	    try {
 	    	Thread.sleep(randInt.nextInt(6000));
 	    } catch (InterruptedException e) {
 
 	    }
-	    System.out.println("Resource use completed!");
+	    System.out.println("Resource use completed! " + getPID());
 	    remoteServer.freeResource();
 	}
 	
@@ -48,7 +55,7 @@ public class Client implements ClientRequestManager {
 	private void run(){
 		while(true){
 			try {
-				System.out.println("Resource requested.");
+				System.out.println("Resource requested. " + getPID());
 
 				remoteServer.requestResource(remoteClient);
 				Thread.sleep(10000);

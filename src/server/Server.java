@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import client.ClientRequestManager;
 
+
 public class Server implements ServerRequestManager {
 
 	private ArrayList<ClientRequestManager> resourceRequests;
@@ -21,18 +22,16 @@ public class Server implements ServerRequestManager {
 		
 		if (requester instanceof ClientRequestManager){
 			ClientRequestManager clientRequester = (ClientRequestManager)requester;
-			if (resourceRequests.isEmpty()) {
-				clientRequester.receiveResource();
-			} else {
-				resourceRequests.add(clientRequester);
-			}
+			resourceRequests.add(clientRequester);
+			resourceRequests.get(0).receiveResource();
+
 		}
 	}
 
 	@Override
 	public void freeResource() throws RemoteException{
+		resourceRequests.remove(0);
 		if (!resourceRequests.isEmpty()) {
-			resourceRequests.remove(0);
 			resourceRequests.get(0).receiveResource();
 		}
 	}
