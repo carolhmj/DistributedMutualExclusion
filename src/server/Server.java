@@ -8,31 +8,66 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+
 import client.ClientRequestManager;
 
 
 public class Server implements ServerRequestManager {
 
-	private ArrayList<ClientRequestManager> resourceRequests;
+	private ArrayList<ClientRequestPair> resourceRequests;
 	String address;
 	Registry registry;
+	
+	private class ClientRequestPair {
+		ClientRequestManager requester;
+		String requesterInfo;
+		
+		public ClientRequestPair(ClientRequestManager requester, String requesterInfo) {
+			this.requester = requester;
+			this.requesterInfo = requesterInfo;
+		}
+	}
+	
+	public String printResourceRequests() {
+		String res = "{";
+		for (ClientRequestPair clientRequestPair : resourceRequests){
+			res = res + "[";
+			res = res + clientRequestPair.requesterInfo;
+			res = res + "]";
+		}
+		res = res + "}";
+		return res;
+	}
 	
 	@Override
 	public void requestResource(Remote requester) throws RemoteException {
 		
 		if (requester instanceof ClientRequestManager){
 			ClientRequestManager clientRequester = (ClientRequestManager)requester;
-			resourceRequests.add(clientRequester);
-			resourceRequests.get(0).receiveResource();
-
+			String requesterInfo = clientRequester.getClientInfo();
+			ClientRequestPair clientRequestPair = new ClientRequestPair(clientRequester, requesterInfo);
+			System.out.println("Received request from: " + requesterInfo);
+			resourceRequests.add(clientRequestPair);
+			
+			System.out.println("Request queue:");
+			System.out.println(printResourceRequests());
+			
+			//Processo é o único da fila
+			if (resourceRequests.size() == 1) {
+				resourceRequests.get(0).requester.receiveResource();
+			}
+			
 		}
 	}
 
 	@Override
 	public void freeResource() throws RemoteException{
+		assert(resourceRequests.isEmpty() == false);
+		System.out.println("Received free");
 		resourceRequests.remove(0);
+		System.out.println(printResourceRequests());
 		if (!resourceRequests.isEmpty()) {
-			resourceRequests.get(0).receiveResource();
+			resourceRequests.get(0).requester.receiveResource();
 		}
 	}
 	
@@ -53,7 +88,7 @@ public class Server implements ServerRequestManager {
             registry = LocateRegistry.createRegistry(port);
             //System.setProperty("java.rmi.server.hostname","192.168.25.4");
             registry.rebind("rmiServer", stub);
-            resourceRequests = new ArrayList<ClientRequestManager>();
+            resourceRequests = new ArrayList<ClientRequestPair>();
         }
         catch (RemoteException e)
         {

@@ -1,5 +1,7 @@
 package client;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,17 +18,17 @@ public class Client implements ClientRequestManager {
 	Registry registry;
 	
 
-  public static long getPID() {
+  public static String getPID() {
 	    String processName =
 	      java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
-	    return Long.parseLong(processName.split("@")[0]);
+	    return processName;
 	  }
 	
 	@Override
 	public void receiveResource() throws RemoteException {
 		System.out.println("Obtained resource. " + getPID());
 	    try {
-	    	Thread.sleep(randInt.nextInt(6000));
+	    	Thread.sleep(randInt.nextInt(20000));
 	    } catch (InterruptedException e) {
 
 	    }
@@ -42,7 +44,7 @@ public class Client implements ClientRequestManager {
 		try {
 			registry = LocateRegistry.getRegistry("127.0.1.1",3232);
 			remoteServer = (ServerRequestManager) registry.lookup("rmiServer");
-	        remoteClient = (ClientRequestManager)UnicastRemoteObject.exportObject(this, 0);
+	        remoteClient = (ClientRequestManager) UnicastRemoteObject.exportObject(this, 0);
 
 			
 		} catch (RemoteException | NotBoundException e) {
@@ -55,14 +57,17 @@ public class Client implements ClientRequestManager {
 	private void run(){
 		while(true){
 			try {
-				System.out.println("Resource requested. " + getPID());
-
-				remoteServer.requestResource(remoteClient);
 				Thread.sleep(10000);
-			} catch (RemoteException | InterruptedException e) {
+			} catch (InterruptedException e) {
+			
+			}
+			
+			System.out.println("Resource requested. " + getPID());
+			try {
+				remoteServer.requestResource(remoteClient);
+			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
-
 		}
 		
 	}
@@ -71,6 +76,17 @@ public class Client implements ClientRequestManager {
 
 		Client client = new Client();
 		client.run();
+	}
+
+	@Override
+	public String getClientInfo() throws RemoteException {
+		String hostName;
+		try {
+			hostName = (InetAddress.getLocalHost()).toString();
+		} catch (UnknownHostException e) {
+			hostName = "unknownHost";
+		} 
+		return hostName + " # " + getPID();
 	}
 
 }
