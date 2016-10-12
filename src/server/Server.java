@@ -40,20 +40,27 @@ public class Server implements ServerRequestManager {
 	}
 	
 	@Override
-	synchronized public void requestResource(Remote requester) throws RemoteException {
+	public void requestResource(Remote requester) throws RemoteException {
 		
 		if (requester instanceof ClientRequestManager){
 			ClientRequestManager clientRequester = (ClientRequestManager)requester;
 			String requesterInfo = clientRequester.getClientInfo();
 			ClientRequestPair clientRequestPair = new ClientRequestPair(clientRequester, requesterInfo);
 			System.out.println("Received request from: " + requesterInfo);
-			resourceRequests.add(clientRequestPair);
+			
+			boolean onlyRequest = false;
+			synchronized (this) {
+				resourceRequests.add(clientRequestPair);
+				if (resourceRequests.size() == 1){
+					onlyRequest = true;
+				}
+			}
 			
 			System.out.println("Request queue:");
 			System.out.println(printResourceRequests());
 			
 			//Processo é o único da fila
-			if (resourceRequests.size() == 1) {
+			if (onlyRequest) {
 				resourceRequests.get(0).requester.receiveResource();
 			}
 			

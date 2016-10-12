@@ -59,7 +59,7 @@ public class Client implements ClientRequestManager {
 	private void run(){
 		while(true){
 			try {
-				Thread.sleep(15000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 			
 			}
