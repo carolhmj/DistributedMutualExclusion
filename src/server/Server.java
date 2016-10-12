@@ -71,7 +71,7 @@ public class Server implements ServerRequestManager {
 		}
 	}
 	
-	public Server() throws RemoteException {
+	public Server(String ip) throws RemoteException {
 		try
         {
             address = (InetAddress.getLocalHost()).toString();
@@ -84,9 +84,9 @@ public class Server implements ServerRequestManager {
         System.out.println("this address=" + address + ",port=" + port);
         try
         {
+        	System.setProperty("java.rmi.server.hostname", ip);
             ServerRequestManager stub = (ServerRequestManager)UnicastRemoteObject.exportObject(this, 0);
             registry = LocateRegistry.createRegistry(port);
-            //System.setProperty("java.rmi.server.hostname","192.168.25.4");
             registry.rebind("rmiServer", stub);
             resourceRequests = new ArrayList<ClientRequestPair>();
         }
@@ -101,7 +101,8 @@ public class Server implements ServerRequestManager {
         try
         {
         	@SuppressWarnings("unused")
-			Server server = new Server();
+        	String ip = (args.length > 0)? args[0] : "localhost";
+			Server server = new Server(ip);
         }
         catch (Exception e)
         {
