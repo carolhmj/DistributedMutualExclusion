@@ -36,13 +36,13 @@ public class Client implements ClientRequestManager {
 	    remoteServer.freeResource();
 	}
 	
-	public Client(String serverAddr){
+	public Client(String serverAddr, int portNumber){
 		
 		
 		randInt = new Random();
 		
 		try {
-			registry = LocateRegistry.getRegistry(serverAddr, 3232);
+			registry = LocateRegistry.getRegistry(serverAddr, portNumber);
 			remoteServer = (ServerRequestManager) registry.lookup("rmiServer");
 	        remoteClient = (ClientRequestManager) UnicastRemoteObject.exportObject(this, 0);
 
@@ -74,10 +74,14 @@ public class Client implements ClientRequestManager {
 	
 	static public void main(String[] args) {
 		String serverAddr = "localhost";
-		if (args.length > 0) {
+		int portAddr = 3456;
+		if (args.length >= 1) {
 			serverAddr = args[0];
 		}
-		Client client = new Client(serverAddr);
+		if (args.length >= 2) {
+			portAddr = Integer.parseInt(args[1]);
+		}
+		Client client = new Client(serverAddr, portAddr);
 		client.run();
 	}
 

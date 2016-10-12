@@ -71,7 +71,7 @@ public class Server implements ServerRequestManager {
 		}
 	}
 	
-	public Server(String ip) throws RemoteException {
+	public Server(String ip, int port) throws RemoteException {
 		try
         {
             address = (InetAddress.getLocalHost()).toString();
@@ -80,7 +80,6 @@ public class Server implements ServerRequestManager {
         {
             System.out.println("can't get inet address.");
         }
-        int port = 3232;
         System.out.println("this address=" + address + ",port=" + port);
         try
         {
@@ -100,9 +99,10 @@ public class Server implements ServerRequestManager {
     {
         try
         {
+        	String ip = (args.length >= 1)? args[0] : "localhost";
+        	int port = (args.length >= 2)? Integer.parseInt(args[1]) : 3456;
         	@SuppressWarnings("unused")
-        	String ip = (args.length > 0)? args[0] : "localhost";
-			Server server = new Server(ip);
+        	Server server = new Server(ip, port);
         }
         catch (Exception e)
         {
