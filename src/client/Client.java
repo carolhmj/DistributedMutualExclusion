@@ -38,7 +38,8 @@ public class Client implements ClientRequestManager {
 	
 	public Client(String serverAddr, int portNumber){
 		
-		
+		System.out.println("serverAddr:" + serverAddr);
+		System.out.println("por addr: " + portNumber);
 		randInt = new Random();
 		
 		try {
@@ -67,6 +68,7 @@ public class Client implements ClientRequestManager {
 				remoteServer.requestResource(remoteClient);
 			} catch (RemoteException e) {
 				e.printStackTrace();
+				System.exit(1);
 			}
 		}
 		
