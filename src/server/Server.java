@@ -54,10 +54,9 @@ public class Server implements ServerRequestManager {
 				if (resourceRequests.size() == 1){
 					onlyRequest = true;
 				}
+				System.out.println("Request queue:");
+				System.out.println(printResourceRequests());
 			}
-			
-			System.out.println("Request queue:");
-			System.out.println(printResourceRequests());
 			
 			//Processo é o único da fila
 			if (onlyRequest) {
