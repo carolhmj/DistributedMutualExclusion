@@ -31,8 +31,8 @@ public class Server implements ServerRequestManager {
 
 	@Override
 	public void freeResource() throws RemoteException{
+		resourceRequests.remove(0);
 		if (!resourceRequests.isEmpty()) {
-			resourceRequests.remove(0);
 			resourceRequests.get(0).receiveResource();
 		}
 	}
