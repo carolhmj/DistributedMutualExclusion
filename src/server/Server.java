@@ -40,7 +40,7 @@ public class Server implements ServerRequestManager {
 	}
 	
 	@Override
-	public void requestResource(Remote requester) throws RemoteException {
+	synchronized public void requestResource(Remote requester) throws RemoteException {
 		
 		if (requester instanceof ClientRequestManager){
 			ClientRequestManager clientRequester = (ClientRequestManager)requester;
